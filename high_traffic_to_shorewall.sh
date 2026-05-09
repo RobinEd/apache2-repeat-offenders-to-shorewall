@@ -24,13 +24,13 @@ cat /etc/shorewall/blrules | grep -v "#" | grep -v "$MYIP" | uniq >> $TEMPFILE
 # find the nastiest offenders and show values greater than 100
 #
 # daily command for IPv4
-# cat /var/log/apache2/access.log | cut -d' ' -f2 | grep -v :| sort | uniq -c | sort -nr | head -n10 | awk '$1>100'  | cut -b 9-
+# cat /var/log/apache2/access.log | cut -d' ' -f2 | grep -v :| grep -v - | sort | uniq -c | sort -nr | head -n10 | awk '$1>100'  | cut -b 9-
 #
 # hourly command for IPv4
-# grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v : | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-
+# grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v : | grep -v - | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-
 #
 # add the new list into the temp files
-banlist=`grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v : | grep -v "$MYIP" | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-`
+banlist=`grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v : | grep -v - | grep -v "$MYIP" | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-`
 for ip in $banlist
 do
         echo "REJECT    net:$ip all" >> $TEMPFILE
@@ -57,8 +57,8 @@ cat /dev/null > $TEMPFILE
 cat /etc/shorewall6/blrules | grep -v "#" | grep -v "$MYIPv6" | uniq >> $TEMPFILE
 
 # hourly command for ipv6, limit set to 100
-# grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v "\." | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-
-banlistv6=`grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v "\." | grep -v "$MYIPv6" | sort | uniq -c | sort -nr | head -n10 | awk '$1>50' | cut -b 9-`
+# grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v "\." | grep -v - | sort | uniq -c | sort -nr | head -n10 | awk '$1>100' | cut -b 9-
+banlistv6=`grep -h "\[$(date -d -1hour +'%d/%b/%Y:%H:')" /var/log/apache2/access.log | cut -d' ' -f2 | grep -v "\." | grep -v "$MYIPv6" | grep -v - | sort | uniq -c | sort -nr | head -n10 | awk '$1>50' | cut -b 9-`
 for ip in $banlistv6
 do
         echo "REJECT    net:$ip all" >> $TEMPFILE
